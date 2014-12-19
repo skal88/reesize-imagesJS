@@ -33,6 +33,20 @@ $(function(){
 		$dropZone.addClass("fliker"); // Añadimos la clase nofliker
 	}
 
+	function showSelectorSlide(){
+		$contenedorCanvas.fadeOut(function(){
+			$contenedorSelectFile.fadeIn();
+			$btnCanvas.slideUp();
+		});
+	}
+
+	function showCanvasSlide(){
+		$contenedorSelectFile.fadeOut(function(){
+			$contenedorCanvas.fadeIn();
+			$btnCanvas.slideDown();
+		});
+	}
+
 	// Funcion para capturar el archivo
 	function handleFileSelect(evt) {
 	    evt.stopPropagation();
@@ -70,8 +84,8 @@ $(function(){
 			reader.readAsDataURL(file);
 		} else{ // Si el archivo no es una imagen
 			alert("formato de archivo no válido. Solo imagenes plis! :)");
-			dropNormal();
 		}
+		dropNormal();
 	}
 
 	// Al salir de la zona drag'n'drop
@@ -108,14 +122,20 @@ $(function(){
 		// Calculamos el aspectRatio
 		// original height / original width x new width = new height
 		var newHeight = ( img.height / img.width ) * imgWidth ;
-		if( newHeight >= imgHeight ){ // Si al reescalar el ancho a 750px la altura es mayor de 500
+		var newWidth = ( img.width /img.height ) * imgHeight;
+		
+		if(newHeight == imgHeight && newWidth == imgWidth){ // Si la proporcion es la misma guardamos automaticamente
+			// Mismas proporciones
+			canvas.width = imgWidth;
+			canvas.height = imgHeight;
+			console.log("misma proporcion");
+		} else if( newHeight > imgHeight ){ // Si al reescalar el ancho a 750px la altura es mayor de 500
 			canvas.width = imgWidth;
 			canvas.height = newHeight;
 		} else{ // Si la altura es menor de 500
 			canvas.height = imgHeight; // Marcamos como 500px la altura de el canvas
 			canvas.width = ( img.width / img.height ) * imgHeight; // y calculamos la anchura reescalando de nuevo a height 500px
 		}
-
 
 		img.onload = function(){
 			ctx.save();
@@ -124,17 +144,16 @@ $(function(){
 
 			$cut.width(imgWidth);
 			$cut.height(imgHeight);
-			$contenedorSelectFile.fadeOut(function(){
-				$contenedorCanvas.fadeIn();
-				$btnCanvas.slideDown();
-			});
+
+			showCanvasSlide();
+			
 		}
 
 		// Cambiamos el atributo download por el nombre del archivo (En variable global)
 		$("#btn-download").attr("download", imgWidth+"x"+imgHeight+"_"+fileName+".jpg");
 	}
 
-	function moveImage(){
+	function moveImage(callback){
 		var canvasPre = document.getElementById("canvasPre");
 		var canvas = document.getElementById("canvas");
 		canvas.width = imgWidth;
@@ -152,6 +171,8 @@ $(function(){
 			ctx.drawImage(img, posX*-1, posY*-1, canvasPre.width, canvasPre.height ); // Pintamos teniendo en cuenta los tamaños finales
 			ctx.restore();
 		}
+		if(typeof(callback) === "function")
+			callback();
 	}
 
 	function SaveImage(){
@@ -160,9 +181,6 @@ $(function(){
 		var dataURL = canvas.toDataURL('image/jpeg', imgCompress); // Seleccionamos el formato y la compresión
 	    document.getElementById('btn-download').href = dataURL; // y modificamos el enlace por la url de la imagen generada
 	}
-
-
-
 
 //                    Acciones
 /*******************************************************/	
@@ -175,37 +193,21 @@ $(function(){
       	} 
     });
 
-
-
-
-
-
 //                EVENTS LISTENERS
 /********************************************************/
-
 
 	// DRAG'N'DROP Listeners
 	var dropZone = document.getElementById('drop_zone');
 	dropZone.addEventListener('dragover', handleDragOver, false); // Al pasar por encima con un archivo
 	dropZone.addEventListener('drop', handleFileSelect, false); // Al soltar el archivo en la zona
 	dropZone.addEventListener('dragleave', handleDragLeave, false); // Al salir de la zona Drag'n'Drop
-
 	// Al cambiar de archivo en el campo examinar del formulario
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 	// Botón Guardar
-	document.getElementById('btn-download').addEventListener('click', function(){
-		SaveImage();
-	});
-
+	document.getElementById('btn-download').addEventListener('click', SaveImage, false);
 	// Botón Volver
-    document.getElementById('btn-return').addEventListener('click', function(){
-    	$contenedorCanvas.fadeOut(function(){
-    		dropNormal();
-			$contenedorSelectFile.fadeIn();
-			$btnCanvas.slideUp();
-		});
-    });
+    document.getElementById('btn-return').addEventListener('click', showSelectorSlide, false);
 
     // Formulario de tamaños
     $("#iSize").change(function(){
