@@ -1,0 +1,350 @@
+<html>
+<head>
+	<meta charset="utf8">
+	<link rel="icon" href="favicon.ico">
+	<title>Creador 750x500 - Aplicación</title>
+	<link rel="stylesheet" href="css/jquery-ui.css">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+	<link rel="stylesheet" href="css/cover.css">
+
+	<style type="text/css">
+		.fliker{  
+			box-shadow:0px 0px 5px #66afe9;
+			-webkit-box-shadow:0px 0px 5px #66afe9;		
+			animation: parpadeo 2.5s;
+			-webkit-animation: parpadeo 2.5s;
+		    -moz-animation: parpadeo 2.5s;
+			animation-iteration-count:infinite;
+			-webkit-animation-iteration-count:infinite;
+		    -moz-animation-iteration-count:infinite;
+		    opacity: 0.75;
+		    transition: 0.2s;
+		    -webkit-transition: 0.2s;
+		}
+		.nofliker{
+			transition: 1s;
+		    -webkit-transition: 1s;
+		}
+		.errorfliker{
+			background: rgba(255,40,40,0.7) !important;
+			box-shadow: 0px 0px 5px rgba(255,40,40,0.7) !important;
+			-webkit-box-shadow: 0px 0px 5px rgba(255,40,40,0.7) !important;
+			animation: none;
+			-webkit-animation: none;
+		    -moz-animation: none;
+		}
+		@keyframes parpadeo {	
+			0%	{box-shadow: 0px 0px 5px #66afe9}
+			50%	{box-shadow: 0px 0px 20px #66afe9}
+			100%{box-shadow: 0px 0px 5px #66afe9}	
+		}
+		
+		@-webkit-keyframes parpadeo {	
+			0%	{-webkit-box-shadow: 0px 0px 5px #66afe9}
+			50%	{-webkit-box-shadow: 0px 0px 20px #66afe9}
+			100%{-webkit-box-shadow: 0px 0px 5px #66afe9}
+		}
+	</style>
+	
+</head>
+<body>
+
+<div class="site-wrapper">
+
+	<div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand" id="tituloImg">Imagen a 750x500</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li class="active"><a href="#">Aplicación</a></li>
+                  <li><a href="contact.html">Ayuda</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+
+          <div id="loader" class="inner cover" style="display: none; z-index: 999">
+            <p class="lead"><img src="img/ajax-loader.gif"></p>
+          </div>
+
+
+          <div id="contSelectFile" class="inner cover">
+            <h1 class="cover-heading">Selecciona el archivo</h1>
+            <p class="lead">
+
+            	<form class="form-inline" role="form" id="iSize">
+				  <div class="form-group">
+				    <div class="input-group">
+				      <label class="sr-only" for="iWidth">Alto</label>
+				      <input type="number" value="750" class="form-control" id="iWidth" placeholder="750">
+				    </div>
+				    <div class="input-group">
+				      <label class="sr-only" for="iHeight">Ancho</label>
+				      <input type="number" value="500" class="form-control" id="iHeight" placeholder="500">
+				    </div>
+				  </div>
+				</form>
+
+            </p>
+            <p class="lead">
+            	<div id="drop_zone" style="padding: 10px; background-color: #555; border-radius: 8px;">
+            		<div style="padding: 80px 20px; border: dotted 3px white; border-radius: 8px"><p>Arrastra aquí la Imagen</p><p>O</p><div style="display: inline-block"><input type="file" id="files" name="files[]" /></div></div>
+            	</div>
+            </p>
+            <p class="lead"><output id="list"></output></p>
+          </div>
+
+
+
+          <div id="contCanvasPre" class="inner cover" style="display: none">
+            <h1 class="cover-heading">Selecciona el area</h1>
+            <p class="lead">
+            	<div id="contCut" style="display: inline-block">
+            		<div id="cut" style="position: fixed; background: rgba(255,0,0,0.5); z-index: 999; width: 750px; height: 500px;">&nbsp;</div>
+            		<canvas id="canvasPre" style="position: relative; top: 0; left: 0;"></canvas>
+            		<canvas id="canvas" width="750" height="500" style="display: none"></canvas>
+            	</div>
+            </p>
+            <p class="lead">
+            	<p>Creado por <a href="http://albertmula.com">Albert Mulà</a>, para <a href="http://www.mediatrends.es">MediaTrends</a>.</p>
+            </p>
+          </div>
+
+          <div class="btn-canvas" style="display: none; position: fixed; bottom: 0px; right: 50px; z-index: 999; padding-bottom: 30px;"><a href="#" class="btn btn-success" id="btn-download" download="my-file-name.jpg">Guardar</a></div>
+          <div class="btn-canvas" style="display: none; position: fixed; bottom: 0px; left: 50px; z-index: 999; padding-bottom: 30px;"><a href="#" class="btn btn-default" id="btn-return">Volver</a></div>
+
+        </div>
+
+      </div>
+
+</div> <!-- / site-wrapper -->
+
+
+
+
+
+
+
+
+<!-- Contenedor -->
+
+<div id="container">
+	<div id="final" style="position: fixed; display: none">final</div>
+	<img src=""  style="display:none">
+</div> <!-- / Contenedor -->
+
+
+<script src="js/jquery-1.9.1.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+
+$(function(){
+
+	// Default values
+	var fileName = '';
+	var Sfile = '';
+	var imgWidth = 750;
+	var imgHeight = 500;
+	var imgCompress = 1;
+
+	// Elements
+	var $cut = $("#cut");
+	var $canvasPre = $("#canvasPre");
+	var $contenedorCanvas = $("#contCanvasPre");
+	var $contenedorSelectFile = $("#contSelectFile");
+	var $dropZone = $("#drop_zone");
+	var $btnCanvas = $(".btn-canvas");
+
+
+	// Funcion para capturar el archivo
+	function handleFileSelect(evt) {
+	    evt.stopPropagation();
+	    evt.preventDefault();
+	    
+	    // Comprobamos si existe el evento 'dataTransfer'
+	    if( typeof(evt.dataTransfer) !== "undefined" ) // Si existe buscamos el archivo mediante avt.dataTransfer.file (significa que viene del drag'n'drop)
+	    	var files = evt.dataTransfer.files; // FileList object
+	    else // Si no existe lo buscamos normal desde el campo examinar (form)
+	    	var files = evt.target.files;
+
+	    var file = files[0]; // Cogemos el primer elemento del array ( solo se permite un archivo )
+	    fileName = escape(file.name); // Guardamos el nombre en la variable global fileName
+	    fileName = fileName.substr(0, fileName.lastIndexOf(".")); // Elimina la extensión del nombre del archivo
+
+	    if (file.type.match('image.*')) { // Comprobamos que es un archivo de imagen
+			var reader = new FileReader(); // Abrimos el archivo
+			// Cogemos la información del archivo cuando carga.
+			reader.onload = (function(theFile) {
+				return function(e) {
+					Sfile = e.target.result; // Guardamos el fichero en la variable global Sfile
+					setCanvasPre(Sfile);  // Preparamos el canvasPre y pintamos la imagen
+				};
+			})(file);
+
+			// Read in the image file as a data URL.
+			reader.readAsDataURL(file);
+		}
+	}
+
+	// Al salir de la zona drag'n'drop
+	function handleDragLeave(evt){
+		$dropZone.removeClass("fliker"); // Eliminamos la clase 'fliker'
+		$dropZone.removeClass("errorfliker");
+		$dropZone.addClass("nofliker"); // Añadimos la clase nofliker
+	}
+
+	function handleDragOver(evt) {
+		evt.stopPropagation(); // 
+		evt.preventDefault(); // Evitamos la acción por defecto
+		evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+
+	    
+	    // Comprobamos si existe el evento 'dataTransfer'
+	    if( typeof(evt.dataTransfer) !== "undefined" ){ // Si existe buscamos el archivo mediante avt.dataTransfer.file (significa que viene del drag'n'drop)
+	    	var files = evt.dataTransfer.files; // FileList object
+	    	var file = files[0]; // Cogemos el primer elemento del array ( solo se permite un archivo )
+
+	    	if (!file.type.match('image.*')) {
+				$dropZone.addClass("errorfliker"); // Añadimos la clase 'fliker'
+	    	} else{
+				$("#drop_zone").removeClass("errorfliker"); // Añadimos la clase 'fliker'
+	    	}
+
+		}
+		$dropZone.removeClass("nofliker"); // Eliminamos la clase 'nofliker'
+		$dropZone.addClass("fliker"); // Añadimos la clase 'fliker'
+	}
+
+
+	function setCanvasPre(file){
+		var canvas = document.getElementById("canvasPre");
+		var ctx = canvas.getContext('2d');
+
+		var img = new Image();
+		img.src = file;
+
+		// Calculamos el aspectRatio
+		// original height / original width x new width = new height
+		var newHeight = ( img.height / img.width ) * imgWidth ;
+		if( newHeight >= imgHeight ){ // Si al reescalar el ancho a 750px la altura es mayor de 500
+			canvas.width = imgWidth;
+			canvas.height = newHeight;
+		} else{ // Si la altura es menor de 500
+			canvas.height = imgHeight; // Marcamos como 500px la altura de el canvas
+			canvas.width = ( img.width / img.height ) * imgHeight; // y calculamos la anchura reescalando de nuevo a height 500px
+		}
+
+
+		img.onload = function(){
+			ctx.save();
+			ctx.drawImage(img, 0, 0, canvas.width, canvas.height ); // Pintamos teniendo en cuenta los tamaños finales
+			ctx.restore();
+
+			$cut.width(imgWidth);
+			$cut.height(imgHeight);
+			$contenedorSelectFile.fadeOut(function(){
+				$contenedorCanvas.fadeIn();
+				$btnCanvas.slideDown();
+			});
+		}
+
+		// Cambiamos el atributo download por el nombre del archivo (En variable global)
+		$("#btn-download").attr("download", imgWidth+"x"+imgHeight+"_"+fileName+".jpg");
+	}
+
+	function moveImage(){
+		var canvasPre = document.getElementById("canvasPre");
+		var canvas = document.getElementById("canvas");
+		canvas.width = imgWidth;
+		canvas.height = imgHeight;
+		var ctx = canvas.getContext('2d');
+
+		var img = new Image();
+		img.src = Sfile;
+
+		var posX = $cut.position().left - $canvasPre.position().left;
+		var posY = $cut.offset().top - $canvasPre.offset().top ;
+		
+		img.onload = function(){
+			ctx.save();
+			ctx.drawImage(img, posX*-1, posY*-1, canvasPre.width, canvasPre.height ); // Pintamos teniendo en cuenta los tamaños finales
+			ctx.restore();
+		}
+	}
+
+	function SaveImage(){
+		var canvas = document.getElementById("canvas"); // Seleccionamos el canvas
+
+		var dataURL = canvas.toDataURL('image/jpeg', imgCompress); // Seleccionamos el formato y la compresión
+	    document.getElementById('btn-download').href = dataURL; // y modificamos el enlace por la url de la imagen generada
+	}
+
+
+
+
+//                    Acciones
+/*******************************************************/	
+	// Inicializamos el draggable de jQueryUI
+	$cut.draggable({ 
+		containment: "#contCut", 
+		scroll: false, 
+		stop: function() {
+        	moveImage();
+      	} 
+    });
+
+
+
+
+
+
+//                EVENTS LISTENERS
+/********************************************************/
+
+
+	// DRAG'N'DROP Listeners
+	var dropZone = document.getElementById('drop_zone');
+	dropZone.addEventListener('dragover', handleDragOver, false); // Al pasar por encima con un archivo
+	dropZone.addEventListener('drop', handleFileSelect, false); // Al soltar el archivo en la zona
+	dropZone.addEventListener('dragleave', handleDragLeave, false); // Al salir de la zona Drag'n'Drop
+
+	// Al cambiar de archivo en el campo examinar del formulario
+	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+	// Botón Guardar
+	document.getElementById('btn-download').addEventListener('click', function(){
+		SaveImage();
+	});
+
+	// Botón Volver
+    document.getElementById('btn-return').addEventListener('click', function(){
+    	$contenedorCanvas.fadeOut(function(){
+    		$dropZone.removeClass("fliker");
+			$contenedorSelectFile.fadeIn();
+			$btnCanvas.slideUp();
+		});
+    });
+
+    // Formulario de tamaños
+    $("#iSize").change(function(){
+    	imgWidth = $("#iWidth").val();
+    	imgHeight = $("#iHeight").val();
+    	$("#tituloImg").html("Imagen a "+imgWidth+"x"+imgHeight);
+    })
+});
+
+</script>
+</body>
+</html>
