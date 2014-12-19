@@ -15,6 +15,23 @@ $(function(){
 	var $dropZone = $("#drop_zone");
 	var $btnCanvas = $(".btn-canvas");
 
+	function dropNormal(){
+		$dropZone.removeClass("errorfliker");
+		$dropZone.removeClass("fliker"); // Eliminamos la clase 'fliker'
+		$dropZone.addClass("nofliker"); // Añadimos la clase nofliker
+	}
+
+	function dropError(){
+		$dropZone.removeClass("nofliker");
+		$dropZone.removeClass("fliker"); // Eliminamos la clase 'fliker'
+		$dropZone.addClass("errorfliker"); // Añadimos la clase nofliker
+	}
+
+	function dropOver(){
+		$dropZone.removeClass("nofliker");
+		$dropZone.removeClass("errorfliker"); // Eliminamos la clase 'fliker'
+		$dropZone.addClass("fliker"); // Añadimos la clase nofliker
+	}
 
 	// Funcion para capturar el archivo
 	function handleFileSelect(evt) {
@@ -32,7 +49,7 @@ $(function(){
 	    	var file = files[0]; // Cogemos el primer elemento del array ( solo se permite un archivo )
 
 	    } else{ // Más de un archivo
-	    	console.log("archivos "+files.length);
+	    	alert("No puedes añadir más de un archivo. De momento... ;)")
 	    	return; // Por el momento no aceptamos más de un archivo
 	    }
 
@@ -52,15 +69,14 @@ $(function(){
 			// Read in the image file as a data URL.
 			reader.readAsDataURL(file);
 		} else{ // Si el archivo no es una imagen
-			console.log("formato de archivo no válido");
+			alert("formato de archivo no válido. Solo imagenes plis! :)");
+			dropNormal();
 		}
 	}
 
 	// Al salir de la zona drag'n'drop
 	function handleDragLeave(evt){
-		$dropZone.removeClass("fliker"); // Eliminamos la clase 'fliker'
-		$dropZone.removeClass("errorfliker");
-		$dropZone.addClass("nofliker"); // Añadimos la clase nofliker
+		dropNormal();
 	}
 
 	function handleDragOver(evt) {
@@ -74,15 +90,11 @@ $(function(){
 	    	var files = evt.dataTransfer.files; // FileList object
 	    	var file = files[0]; // Cogemos el primer elemento del array ( solo se permite un archivo )
 
-	    	if (!file.type.match('image.*')) {
-				$dropZone.addClass("errorfliker"); // Añadimos la clase 'fliker'
-	    	} else{
-				$("#drop_zone").removeClass("errorfliker"); // Añadimos la clase 'fliker'
-	    	}
-
+	    	if (!file.type.match('image.*'))
+				dropError(); // Error
+	    	else
+				dropOver(); // parpadear
 		}
-		$dropZone.removeClass("nofliker"); // Eliminamos la clase 'nofliker'
-		$dropZone.addClass("fliker"); // Añadimos la clase 'fliker'
 	}
 
 
@@ -189,7 +201,7 @@ $(function(){
 	// Botón Volver
     document.getElementById('btn-return').addEventListener('click', function(){
     	$contenedorCanvas.fadeOut(function(){
-    		$dropZone.removeClass("fliker");
+    		dropNormal();
 			$contenedorSelectFile.fadeIn();
 			$btnCanvas.slideUp();
 		});
